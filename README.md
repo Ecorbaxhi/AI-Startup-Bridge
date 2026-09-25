@@ -25,7 +25,7 @@ Open `http://127.0.0.1:8000`. The local `.env` created for this workspace contai
 
 ## Configuration
 
-`DATABASE_URL`, `SESSION_SECRET_KEY`, `ENVIRONMENT`, and optional `OPENAI_API_KEY` are supported. `SESSION_SECRET_KEY` must be generated securely in production. Admin registration is deliberately not exposed in the public form; create an admin through a controlled server-side process.
+`DATABASE_URL`, `SESSION_SECRET_KEY`, `ENVIRONMENT`, and optional `OPENAI_API_KEY` are supported. `SESSION_SECRET_KEY` must be generated securely in production. Admin registration is deliberately not exposed in the public form; create an admin through a controlled server-side process. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in a protected shell and run `python scripts/create_admin.py`; never put the password in Git.
 
 ## Tests and demo data
 
