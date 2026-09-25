@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block title %}Admin dashboard{% endblock %}{% block content %}<section><p class="eyebrow">ADMINISTRATION</p><h1>Bridge overview.</h1><div class="grid">{% for label, value in stats.items() %}<article class="card"><span class="tag">{{ label|replace('_', ' ') }}</span><h2>{{ value }}</h2></article>{% endfor %}</div></section>{% endblock %}

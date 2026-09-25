@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: albania-ai-startup-bridge
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: albania-bridge-db
+          property: connectionString
+      - key: SESSION_SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+databases:
+  - name: albania-bridge-db
+    databaseName: albania_bridge
+    user: bridge_user
