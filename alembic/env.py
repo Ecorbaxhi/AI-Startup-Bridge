@@ -5,17 +5,17 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from app.database import Base
+from app.database import Base, database_url
 from app import models
 from app.config import settings
 
 config = context.config
-config.set_main_option('sqlalchemy.url', settings.database_url.replace('%', '%%'))
+config.set_main_option('sqlalchemy.url', database_url(settings.database_url).replace('%', '%%'))
 if config.config_file_name: fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 def run_migrations_offline():
-    context.configure(url=settings.database_url, target_metadata=target_metadata, literal_binds=True, dialect_opts={'paramstyle': 'named'})
+    context.configure(url=database_url(settings.database_url), target_metadata=target_metadata, literal_binds=True, dialect_opts={'paramstyle': 'named'})
     with context.begin_transaction(): context.run_migrations()
 
 def run_migrations_online():

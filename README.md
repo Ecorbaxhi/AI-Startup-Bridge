@@ -44,4 +44,4 @@ Create a repository, then run `git remote add origin <your-repository-url>` and 
 
 ## Known limitations and next steps
 
-This MVP uses basic signed sessions and form workflows. CSRF tokens, email verification, richer moderation/reporting, project editing/closing UI, and optional semantic explanations should be added before public launch. Add a production PostgreSQL test service and formal migration CI before handling real users.
+This MVP uses basic signed sessions and form workflows. Email verification, richer moderation/reporting, and optional semantic explanations should be added before public launch. Add a production PostgreSQL test service and formal migration CI before handling real users.

@@ -1,1 +1,6 @@
-{% extends 'base.html' %}{% block title %}Admin dashboard{% endblock %}{% block content %}<section><p class="eyebrow">ADMINISTRATION</p><h1>Bridge overview.</h1><div class="grid">{% for label, value in stats.items() %}<article class="card"><span class="tag">{{ label|replace('_', ' ') }}</span><h2>{{ value }}</h2></article>{% endfor %}</div></section>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<section><p class="eyebrow">ADMINISTRATION</p><h1>Bridge overview.</h1><div class="grid">{% for label, value in stats.items() %}<article class="card"><span class="tag">{{ label|replace('_', ' ') }}</span><h2>{{ value }}</h2></article>{% endfor %}</div>
+<h2>Recent projects</h2><div class="grid">{% for project in projects %}<article class="card"><span class="tag">{{ project.status }}</span><h3>{{ project.title }}</h3>{% if project.status not in ['deactivated', 'closed'] %}<form method="post" action="/admin/projects/{{ project.id }}/deactivate"><input type="hidden" name="csrf" value="{{ csrf_token }}"><button class="button">Deactivate</button></form>{% endif %}</article>{% endfor %}</div></section>
+{% endblock %}

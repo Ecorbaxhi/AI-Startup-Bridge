@@ -11,5 +11,10 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    def validate_production(self):
+        if self.environment == "production" and len(self.session_secret_key) < 32:
+            raise ValueError("SESSION_SECRET_KEY must be at least 32 characters in production")
+
 
 settings = Settings()
+settings.validate_production()
