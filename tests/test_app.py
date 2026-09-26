@@ -10,7 +10,7 @@ from app.database import Base, SessionLocal, engine
 from app.main import app
 from app.matching import match_student_project
 from app.auth import hash_password
-from app.models import Project, StudentProfile, University, User
+from app.models import Project, StartupProfile, StudentProfile, University, User
 
 
 def csrf(client, path):
@@ -118,9 +118,26 @@ def test_admin_route_is_protected():
         assert client.get("/admin", follow_redirects=False).status_code == 303
     db = SessionLocal()
     db.add(User(email="admin@test.local", password_hash=hash_password("admin-password-123"), role="admin"))
+    startup = User(email="moderated-startup@test.local", password_hash=hash_password("startup-password-123"), role="startup")
+    db.add(startup)
+    db.flush()
+    profile = StartupProfile(user_id=startup.id, company_name="Moderated Startup")
+    db.add(profile)
+    db.flush()
+    db.add(Project(startup_id=profile.id, title="Moderated project", description="Project for moderation test"))
     db.commit()
     db.close()
     with TestClient(app) as client:
         token = csrf(client, "/login")
         client.post("/login", data={"csrf": token, "email": "admin@test.local", "password": "admin-password-123"})
         assert client.get("/admin").status_code == 200
+
+        db = SessionLocal()
+        project = db.query(Project).first()
+        db.close()
+        token = csrf(client, "/admin")
+        response = client.post(f"/admin/projects/{project.id}/deactivate", data={"csrf": token}, follow_redirects=False)
+        assert response.status_code == 303
+        db = SessionLocal()
+        assert db.get(Project, project.id).status == "deactivated"
+        db.close()
