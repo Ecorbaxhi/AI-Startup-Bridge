@@ -31,7 +31,7 @@ def setup_function():
 
 def test_health_registration_and_csrf():
     with TestClient(app) as client:
-        assert client.get("/health").json() == {"status": "ok"}
+        assert client.get("/health").json() == {"status": "ok", "database": "ok"}
         assert client.post("/register", data={"email": "bad@test.local", "password": "password123", "role": "student"}, follow_redirects=False).status_code == 422
         token = csrf(client, "/register")
         response = client.post("/register", data={"csrf": token, "email": "student@test.local", "password": "password123", "role": "student"}, follow_redirects=False)
