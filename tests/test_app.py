@@ -84,6 +84,23 @@ def test_startup_project_lifecycle_and_application_flow():
         startup.post(f"/startup/projects/{project_id}/status", data={"csrf": token, "status": "closed"})
         db = SessionLocal(); assert db.query(Project).one().status == "closed"; db.close()
 
+    with TestClient(app) as closed_student:
+        token = csrf(closed_student, "/register")
+        closed_student.post("/register", data={"csrf": token, "email": "closed-applicant@test.local", "password": "password123", "role": "student"})
+        token = csrf(closed_student, "/student/profile")
+        closed_student.post("/student/profile", data={"csrf": token, "full_name": "Closed Applicant", "skills": "Python"})
+        token = csrf(closed_student, f"/projects/{project_id}")
+        response = closed_student.post(f"/projects/{project_id}/apply", data={"csrf": token, "message": "I would like to contribute."}, follow_redirects=False)
+        assert response.status_code == 303
+        assert response.headers["location"] == "/projects"
+
+    with TestClient(app) as other_startup:
+        token = csrf(other_startup, "/register")
+        other_startup.post("/register", data={"csrf": token, "email": "other-startup@test.local", "password": "password123", "role": "startup"})
+        token = csrf(other_startup, f"/startup/projects/{project_id}/edit")
+        other_startup.post(f"/startup/projects/{project_id}/edit", data={"csrf": token, "title": "Unauthorized update", "description": "Should not apply"})
+    db = SessionLocal(); assert db.query(Project).one().title == "Updated AI prototype"; db.close()
+
 
 def test_matching_and_discovery_opt_out():
     student = StudentProfile(full_name="A", field_of_study="Computer Science", skills=["Python"], interests=["AI"], availability="Part-time")

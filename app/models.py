@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -11,7 +11,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(20), index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     student_profile: Mapped["StudentProfile | None"] = relationship(back_populates="user", uselist=False)
     startup_profile: Mapped["StartupProfile | None"] = relationship(back_populates="user", uselist=False)
 
@@ -37,7 +37,7 @@ class StudentProfile(Base):
     bio: Mapped[str] = mapped_column(Text, default="")
     availability: Mapped[str] = mapped_column(String(100), default="")
     discovery_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     user: Mapped[User] = relationship(back_populates="student_profile")
     university: Mapped["University | None"] = relationship(back_populates="students")
     applications: Mapped[list["Application"]] = relationship(back_populates="student")
@@ -54,7 +54,7 @@ class StartupProfile(Base):
     industry: Mapped[str] = mapped_column(String(120), default="")
     innovation_zone: Mapped[str] = mapped_column(String(160), default="")
     contact_name: Mapped[str] = mapped_column(String(160), default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     user: Mapped[User] = relationship(back_populates="startup_profile")
     projects: Mapped[list["Project"]] = relationship(back_populates="startup")
 
@@ -73,7 +73,7 @@ class Project(Base):
     compensation_details: Mapped[str] = mapped_column(String(255), default="")
     expected_deliverables: Mapped[str] = mapped_column(Text, default="")
     status: Mapped[str] = mapped_column(String(30), default="active", index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     startup: Mapped[StartupProfile] = relationship(back_populates="projects")
     applications: Mapped[list["Application"]] = relationship(back_populates="project")
 
@@ -86,6 +86,6 @@ class Application(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), index=True)
     status: Mapped[str] = mapped_column(String(30), default="submitted")
     message: Mapped[str] = mapped_column(Text, default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     student: Mapped[StudentProfile] = relationship(back_populates="applications")
     project: Mapped[Project] = relationship(back_populates="applications")

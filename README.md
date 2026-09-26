@@ -36,6 +36,8 @@ Open `http://127.0.0.1:8000`. The local `.env` created for this workspace contai
 
 The seed script creates clearly fictional universities, students, startups, and projects. Its demo password is for local demonstration only and must never be used in production.
 
+GitHub Actions is configured in `.github/workflows/tests.yml` to install the dependencies and run the test suite on pushes and pull requests after the repository is connected to GitHub.
+
 ## GitHub and Render
 
 Create a repository, then run `git remote add origin <your-repository-url>` and `git push -u origin main`. Do not commit `.env`, databases, credentials, or private user data.

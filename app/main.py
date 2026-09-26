@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -14,7 +15,14 @@ from .database import Base, engine, get_db
 from .matching import match_student_project
 from .models import Application, Project, StartupProfile, StudentProfile, University, User
 
-app = FastAPI(title="Albania AI Startup Bridge")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    if settings.environment != "production":
+        Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(title="Albania AI Startup Bridge", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.session_secret_key, https_only=settings.environment == "production", same_site="lax")
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
@@ -24,12 +32,6 @@ def render(request, name, **context):
     context["current"] = current_user(request)
     context["csrf_token"] = csrf_token(request)
     return templates.TemplateResponse(request=request, name=name, context=context)
-
-
-@app.on_event("startup")
-def startup():
-    if settings.environment != "production":
-        Base.metadata.create_all(bind=engine)
 
 
 def reject_csrf(request: Request, token: str):
