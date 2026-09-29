@@ -31,7 +31,7 @@ Open `http://127.0.0.1:8000`. The local `.env` created for this workspace contai
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe scripts\seed_demo.py
+.\.venv\Scripts\python.exe -m scripts.seed_demo
 ```
 
 The seed script creates clearly fictional universities, students, startups, and projects. Its demo password is for local demonstration only and must never be used in production.
