@@ -1,7 +1,12 @@
 import os
 import re
+from sqlalchemy.engine import make_url
 
-os.environ["DATABASE_URL"] = "sqlite:///./test_bridge.db"
+test_database_url = os.getenv("TEST_DATABASE_URL", "sqlite:///./test_bridge.db")
+if test_database_url.startswith(("postgres://", "postgresql://", "postgresql+")):
+    if make_url(test_database_url).database != "albania_bridge_test":
+        raise RuntimeError("PostgreSQL tests may only use the albania_bridge_test database")
+os.environ["DATABASE_URL"] = test_database_url
 os.environ["SESSION_SECRET_KEY"] = "test-secret"
 os.environ["ENVIRONMENT"] = "test"
 
@@ -47,8 +52,12 @@ def test_role_authorization_and_student_profile():
         token = csrf(client, "/student/profile")
         response = client.post("/student/profile", data={"csrf": token, "full_name": "Student Two", "university_id": "1", "field_of_study": "Computer Science", "skills": "Python, SQL", "interests": "AI", "availability": "Part-time", "discovery_enabled": "on"}, follow_redirects=False)
         assert response.status_code == 303
-        profile = SessionLocal().query(StudentProfile).filter_by(full_name="Student Two").one()
-        assert profile.discovery_enabled is True
+        db = SessionLocal()
+        try:
+            profile = db.query(StudentProfile).filter_by(full_name="Student Two").one()
+            assert profile.discovery_enabled is True
+        finally:
+            db.close()
 
 
 def test_startup_project_lifecycle_and_application_flow():
