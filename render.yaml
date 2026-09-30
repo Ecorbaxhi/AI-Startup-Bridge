@@ -13,6 +13,8 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
+      - key: PYTHON_VERSION
+        value: 3.12.8
       - key: OPENAI_API_KEY
         sync: false
 databases:
